@@ -26,8 +26,9 @@ export const SocketProvider = ({ children }) => {
     }
 
     // Connect to backend Socket.io server
-    const defaultBackend = window.location.hostname === 'localhost' ? 'http://localhost:5000' : 'https://skillswap-ud11.onrender.com';
-    const socketUrl = import.meta.env.VITE_API_URL || defaultBackend;
+    const socketUrl = (typeof window !== 'undefined' && window.location.hostname === 'localhost')
+      ? 'http://localhost:5000'
+      : 'https://skillswap-ud11.onrender.com';
 
     const newSocket = io(socketUrl, {
       auth: { token },

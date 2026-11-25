@@ -1,8 +1,9 @@
 import axios from 'axios';
 
-const API_BASE = import.meta.env.VITE_API_URL 
-  ? `${import.meta.env.VITE_API_URL}/api` 
-  : (window.location.hostname === 'localhost' ? '/api' : 'https://skillswap-ud11.onrender.com/api');
+const BACKEND_URL = 'https://skillswap-ud11.onrender.com';
+const API_BASE = (typeof window !== 'undefined' && window.location.hostname === 'localhost')
+  ? '/api'
+  : `${BACKEND_URL}/api`;
 
 const api = axios.create({
   baseURL: API_BASE,
