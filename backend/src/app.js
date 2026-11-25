@@ -72,6 +72,15 @@ app.get('/api/docs.json', (req, res) => {
   res.send(swaggerSpec);
 });
 
+// Root health check endpoint
+app.get('/', (req, res) => {
+  res.status(200).json({
+    status: 'healthy',
+    message: 'Skill-Swap API is running',
+    timestamp: new Date().toISOString()
+  });
+});
+
 // Health check endpoint
 app.get('/api/health', (req, res) => {
   res.status(200).json({
