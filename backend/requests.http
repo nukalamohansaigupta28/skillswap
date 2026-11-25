@@ -1,0 +1,125 @@
+### ==============================================================================
+### Skill-Swap Platform - Full REST API Test Collection (Phases 1 - 6)
+### Base URL: http://localhost:5000
+### ==============================================================================
+
+@baseUrl = http://localhost:5000
+@userToken = {{loginUser.response.body.token}}
+@bobToken = {{loginBob.response.body.token}}
+@adminToken = {{loginAdmin.response.body.token}}
+@createdUserId = {{registerUser.response.body.user._id}}
+@bobUserId = {{registerBob.response.body.user._id}}
+@sessionId = {{proposeSession.response.body.data._id}}
+@reportId = {{createReport.response.body.data._id}}
+
+### ------------------------------------------------------------------------------
+### 1. AUTHENTICATION & LOGIN
+### ------------------------------------------------------------------------------
+
+### 1.1 Login as Alice
+# @name loginUser
+POST {{baseUrl}}/api/auth/login
+Content-Type: application/json
+
+{
+  "email": "alice@example.com",
+  "password": "Password123!"
+}
+
+### 1.2 Login as Bob
+# @name loginBob
+POST {{baseUrl}}/api/auth/login
+Content-Type: application/json
+
+{
+  "email": "bob@example.com",
+  "password": "Password123!"
+}
+
+### 1.3 Login as Admin
+# @name loginAdmin
+POST {{baseUrl}}/api/auth/login
+Content-Type: application/json
+
+{
+  "email": "admin@skillswap.com",
+  "password": "AdminPass123!"
+}
+
+### ------------------------------------------------------------------------------
+### 2. REVIEWS & RATINGS (PHASE 6)
+### ------------------------------------------------------------------------------
+
+### 2.1 Post a 5-Star Review after Completed Session
+POST {{baseUrl}}/api/reviews
+Authorization: Bearer {{userToken}}
+Content-Type: application/json
+
+{
+  "sessionId": "{{sessionId}}",
+  "rating": 5,
+  "comment": "Outstanding lesson! Bob explained JavaScript closures and asynchronous promises with total clarity."
+}
+
+### 2.2 Get Public Reviews for Bob
+GET {{baseUrl}}/api/users/{{bobUserId}}/reviews
+
+### ------------------------------------------------------------------------------
+### 3. SAFETY & USER ABUSE REPORTS (PHASE 6)
+### ------------------------------------------------------------------------------
+
+### 3.1 Submit a Misconduct Report
+# @name createReport
+POST {{baseUrl}}/api/reports
+Authorization: Bearer {{userToken}}
+Content-Type: application/json
+
+{
+  "reportedUserId": "{{bobUserId}}",
+  "reason": "NO_SHOW",
+  "details": "User did not show up to the scheduled meeting link without prior notice."
+}
+
+### ------------------------------------------------------------------------------
+### 4. ADMIN GOVERNANCE & ANALYTICS (PHASE 6)
+### ------------------------------------------------------------------------------
+
+### 4.1 Admin Analytics Dashboard
+GET {{baseUrl}}/api/admin/analytics
+Authorization: Bearer {{adminToken}}
+
+### 4.2 Admin List All Users
+GET {{baseUrl}}/api/admin/users?page=1&limit=20
+Authorization: Bearer {{adminToken}}
+
+### 4.3 Admin Suspend a User
+PATCH {{baseUrl}}/api/admin/users/{{bobUserId}}/status
+Authorization: Bearer {{adminToken}}
+Content-Type: application/json
+
+{
+  "status": "suspended"
+}
+
+### 4.4 Admin Re-activate a User
+PATCH {{baseUrl}}/api/admin/users/{{bobUserId}}/status
+Authorization: Bearer {{adminToken}}
+Content-Type: application/json
+
+{
+  "status": "active"
+}
+
+### 4.5 Admin List Abuse Reports
+GET {{baseUrl}}/api/admin/reports?status=open
+Authorization: Bearer {{adminToken}}
+
+### 4.6 Admin Resolve Abuse Report
+PATCH {{baseUrl}}/api/admin/reports/{{reportId}}
+Authorization: Bearer {{adminToken}}
+Content-Type: application/json
+
+{
+  "status": "resolved",
+  "resolutionNotes": "Investigated chat logs and settled dispute with both users."
+}

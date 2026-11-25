@@ -1,0 +1,289 @@
+{
+  "info": {
+    "name": "Skill-Swap Platform REST API Collection",
+    "description": "Complete Postman API test collection for Skill-Swap Platform (Capstone Project). Supports automated token injection, role testing, and complete end-to-end user flows.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:5000/api",
+      "type": "string"
+    },
+    {
+      "key": "authToken",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "adminToken",
+      "value": "",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "1. Authentication",
+      "item": [
+        {
+          "name": "Health Check",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": { "raw": "{{baseUrl}}/health", "host": ["{{baseUrl}}"], "path": ["health"] }
+          }
+        },
+        {
+          "name": "Register User (Gets 2 Starting Credits)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Eva Green\",\n  \"email\": \"eva.green@example.com\",\n  \"password\": \"Password123!\",\n  \"city\": \"Seattle\",\n  \"bio\": \"Passionate pianist looking to learn UI design.\"\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/auth/register", "host": ["{{baseUrl}}"], "path": ["auth", "register"] }
+          }
+        },
+        {
+          "name": "Login User (Alice - Demo)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const res = pm.response.json();",
+                  "if (res.data && res.data.token) {",
+                  "  pm.collectionVariables.set('authToken', res.data.token);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"alice@example.com\",\n  \"password\": \"Password123!\"\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/auth/login", "host": ["{{baseUrl}}"], "path": ["auth", "login"] }
+          }
+        },
+        {
+          "name": "Login Admin (SuperAdmin)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const res = pm.response.json();",
+                  "if (res.data && res.data.token) {",
+                  "  pm.collectionVariables.set('adminToken', res.data.token);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"admin@skillswap.com\",\n  \"password\": \"AdminPass123!\"\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/auth/login", "host": ["{{baseUrl}}"], "path": ["auth", "login"] }
+          }
+        },
+        {
+          "name": "Get Current User Profile (Me)",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{authToken}}" }],
+            "url": { "raw": "{{baseUrl}}/auth/me", "host": ["{{baseUrl}}"], "path": ["auth", "me"] }
+          }
+        },
+        {
+          "name": "Refresh Access Token",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Authorization", "value": "Bearer {{authToken}}" }],
+            "url": { "raw": "{{baseUrl}}/auth/refresh", "host": ["{{baseUrl}}"], "path": ["auth", "refresh"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "2. Skill Catalog",
+      "item": [
+        {
+          "name": "Browse Approved Skills",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/skills?limit=20", "host": ["{{baseUrl}}"], "path": ["skills"], "query": [{ "key": "limit", "value": "20" }] }
+          }
+        },
+        {
+          "name": "Filter Skills by Category",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/skills?category=Coding", "host": ["{{baseUrl}}"], "path": ["skills"], "query": [{ "key": "category", "value": "Coding" }] }
+          }
+        },
+        {
+          "name": "Suggest Custom Skill",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{authToken}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Kubernetes Cluster Administration\",\n  \"category\": \"Coding\",\n  \"description\": \"Container orchestration and cluster deployment.\"\n}"
+            },
+            "url": { "raw": "{{baseUrl}}/skills", "host": ["{{baseUrl}}"], "path": ["skills"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "3. User Skills Portfolio",
+      "item": [
+        {
+          "name": "Get My Listed Skills",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{authToken}}" }],
+            "url": { "raw": "{{baseUrl}}/users/me/skills", "host": ["{{baseUrl}}"], "path": ["users", "me", "skills"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "4. Matching Engine",
+      "item": [
+        {
+          "name": "Get Ranked Match Recommendations",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{authToken}}" }],
+            "url": { "raw": "{{baseUrl}}/matches?limit=10", "host": ["{{baseUrl}}"], "path": ["matches"], "query": [{ "key": "limit", "value": "10" }] }
+          }
+        },
+        {
+          "name": "Filter Matches by Mutual Swaps Only",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{authToken}}" }],
+            "url": { "raw": "{{baseUrl}}/matches?matchType=MUTUAL", "host": ["{{baseUrl}}"], "path": ["matches"], "query": [{ "key": "matchType", "value": "MUTUAL" }] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "5. Swap Requests",
+      "item": [
+        {
+          "name": "Get Received Requests Inbox",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{authToken}}" }],
+            "url": { "raw": "{{baseUrl}}/requests?type=received", "host": ["{{baseUrl}}"], "path": ["requests"], "query": [{ "key": "type", "value": "received" }] }
+          }
+        },
+        {
+          "name": "Get Sent Requests Outbox",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{authToken}}" }],
+            "url": { "raw": "{{baseUrl}}/requests?type=sent", "host": ["{{baseUrl}}"], "path": ["requests"], "query": [{ "key": "type", "value": "sent" }] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "6. Sessions & Scheduling",
+      "item": [
+        {
+          "name": "Get Confirmed Sessions",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{authToken}}" }],
+            "url": { "raw": "{{baseUrl}}/sessions?status=confirmed", "host": ["{{baseUrl}}"], "path": ["sessions"], "query": [{ "key": "status", "value": "confirmed" }] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "7. Wallet & Sovereign Credits",
+      "item": [
+        {
+          "name": "Get Wallet Balance & Transaction History",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{authToken}}" }],
+            "url": { "raw": "{{baseUrl}}/wallet", "host": ["{{baseUrl}}"], "path": ["wallet"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "8. Real-Time Chat & Conversations",
+      "item": [
+        {
+          "name": "List Conversations",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{authToken}}" }],
+            "url": { "raw": "{{baseUrl}}/conversations", "host": ["{{baseUrl}}"], "path": ["conversations"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "9. Admin Console & Analytics",
+      "item": [
+        {
+          "name": "Get Admin Platform Telemetry",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{adminToken}}" }],
+            "url": { "raw": "{{baseUrl}}/admin/analytics", "host": ["{{baseUrl}}"], "path": ["admin", "analytics"] }
+          }
+        },
+        {
+          "name": "List All Users (Admin)",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{adminToken}}" }],
+            "url": { "raw": "{{baseUrl}}/admin/users?limit=20", "host": ["{{baseUrl}}"], "path": ["admin", "users"], "query": [{ "key": "limit", "value": "20" }] }
+          }
+        },
+        {
+          "name": "List Safety Reports (Admin)",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{adminToken}}" }],
+            "url": { "raw": "{{baseUrl}}/admin/reports", "host": ["{{baseUrl}}"], "path": ["admin", "reports"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "10. OpenAPI & Documentation",
+      "item": [
+        {
+          "name": "Get OpenAPI 3.0 Specification JSON",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/docs.json", "host": ["{{baseUrl}}"], "path": ["docs.json"] }
+          }
+        }
+      ]
+    }
+  ]
+}
+

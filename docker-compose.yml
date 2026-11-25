@@ -1,0 +1,56 @@
+version: '3.8'
+
+services:
+  # Database Service
+  mongo:
+    image: mongo:6.0
+    container_name: skillswap-mongo
+    restart: always
+    ports:
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_DATABASE: skillswap
+    volumes:
+      - mongo_data:/data/db
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Backend REST API & Socket.io Service
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: skillswap-backend
+    restart: always
+    ports:
+      - "5000:5000"
+    environment:
+      - NODE_ENV=production
+      - PORT=5000
+      - MONGODB_URI=mongodb://mongo:27017/skillswap
+      - JWT_SECRET=production_super_secret_skillswap_key_2026!
+      - JWT_EXPIRES_IN=7d
+      - CORS_ORIGIN=*
+    depends_on:
+      mongo:
+        condition: service_healthy
+
+  # Frontend Web Client Service (NGINX + React SPA)
+  web:
+    build:
+      context: ./web
+      dockerfile: Dockerfile
+    container_name: skillswap-web
+    restart: always
+    ports:
+      - "3000:80"
+    depends_on:
+      - backend
+
+volumes:
+  mongo_data:
+    driver: local
+

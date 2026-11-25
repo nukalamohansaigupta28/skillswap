@@ -1,0 +1,50 @@
+{
+  "name": "skillswap-backend",
+  "version": "1.0.0",
+  "description": "Skill-Swap Platform - Express REST API & Real-time Services",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "nodemon src/server.js",
+    "test": "jest --runInBand --detectOpenHandles",
+    "seed": "node src/seed/demo.js",
+    "seed:skills": "node src/seed/skills.js",
+    "seed:demo": "node src/seed/demo.js"
+  },
+  "keywords": [
+    "skillswap",
+    "express",
+    "mongodb",
+    "jwt",
+    "rest-api",
+    "socket.io",
+    "swagger"
+  ],
+  "author": "Antigravity Team",
+  "license": "ISC",
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2",
+    "express-mongo-sanitize": "^2.2.0",
+    "express-rate-limit": "^7.2.0",
+    "express-validator": "^7.0.1",
+    "helmet": "^7.1.0",
+    "jsonwebtoken": "^9.0.2",
+    "mongodb-memory-server": "^9.2.0",
+    "mongoose": "^8.3.1",
+    "morgan": "^1.10.0",
+    "multer": "^1.4.5-lts.1",
+    "node-cron": "^3.0.3",
+    "socket.io": "^4.7.5",
+    "socket.io-client": "^4.7.5",
+    "swagger-jsdoc": "^6.2.8",
+    "swagger-ui-express": "^5.0.0"
+  },
+  "devDependencies": {
+    "jest": "^29.7.0",
+    "nodemon": "^3.1.0",
+    "supertest": "^6.3.4"
+  }
+}
