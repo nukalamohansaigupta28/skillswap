@@ -13,7 +13,7 @@ const onlineUsers = new Map();
 const initSocket = (httpServer) => {
   io = new Server(httpServer, {
     cors: {
-      origin: env.CLIENT_URL || '*',
+      origin: true,
       methods: ['GET', 'POST'],
       credentials: true
     }
